@@ -43,7 +43,7 @@ const Splash = () => {
   function onEndSplash() {
     setTimeout(() => {
       router.push("/(tabs)");
-    }, 500);
+    }, 350);
   }
 
   useEffect(() => {
