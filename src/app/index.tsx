@@ -42,7 +42,7 @@ const Splash = () => {
 
   function onEndSplash() {
     setTimeout(() => {
-      router.push("/(tabs)");
+      router.push("/students");
     }, 350);
   }
 
