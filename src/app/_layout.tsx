@@ -19,6 +19,7 @@ import {
 } from "@expo-google-fonts/raleway";
 import * as SplashScreen from "expo-splash-screen";
 import { Slot } from "expo-router";
+import "@/styles/global.css";
 
 SplashScreen.preventAutoHideAsync();
 
