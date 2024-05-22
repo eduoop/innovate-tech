@@ -14,16 +14,57 @@ export interface GenderFilter {
   female: boolean;
 }
 
+export interface StudentsSelectedFields extends Partial<Student> {
+  gender: Student["gender"];
+  id: Student["id"];
+  name: Student["name"];
+  registered: Student["registered"];
+  picture: Student["picture"];
+}
+
 const Students = () => {
   const [page, setPage] = useState(1);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<StudentsSelectedFields[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<
+    StudentsSelectedFields[]
+  >([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [genderFilters, setGenderFilters] = useState<GenderFilter>({
     male: true,
     female: true,
   });
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const filterUnusedFields = (students: Student[]) => {
+    return students.map((student) => {
+      return {
+        id: student.id,
+        name: student.name,
+        gender: student.gender,
+        registered: student.registered,
+        picture: student.picture,
+        email: student.email,
+        phone: student.phone,
+        address: student.location,
+        nature: student.nat,
+      };
+    });
+  };
+
+  const getStudents = async () => {
+    setIsLoading(true);
+    try {
+      const data = await api.get(`?results=10&page=${page}`);
+      const filteredFieldsStudents = filterUnusedFields(data.data.results);
+      setStudents(filteredFieldsStudents);
+      setFilteredStudents(filteredFieldsStudents);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const searchStudents = async () => {
     setIsLoading(true);
@@ -32,6 +73,7 @@ const Students = () => {
         `?results=10${page && `&page=${page}`}${search && `&search=${search}`}`,
       );
       setStudents(data.data.results);
+      setFilteredStudents(data.data.results);
       Keyboard.dismiss();
     } catch (error) {
       console.log(error);
@@ -42,7 +84,6 @@ const Students = () => {
 
   const filterStudents = () => {
     if (genderFilters.male && genderFilters.female) {
-      // Se ambos os filtros estiverem selecionados, limpe o array de alunos filtrados
       setFilteredStudents(students);
     } else if (!genderFilters.male && !genderFilters.female) {
       setFilteredStudents(students);
@@ -58,7 +99,19 @@ const Students = () => {
   };
 
   const loadMore = () => {
+    setIsLoadingMore(true);
     setPage(page + 1);
+    api
+      .get(`?results=10&page=${page}${search && `&search=${search}`}`)
+      .then((response) => {
+        const filteredFieldsStudents = filterUnusedFields(
+          response.data.results,
+        );
+
+        setStudents([...students, ...filteredFieldsStudents]);
+        filterStudents();
+        setIsLoadingMore(false);
+      });
   };
 
   useEffect(() => {
@@ -66,7 +119,7 @@ const Students = () => {
   }, [genderFilters]);
 
   useEffect(() => {
-    searchStudents();
+    getStudents();
   }, []);
 
   return (
@@ -100,7 +153,8 @@ const Students = () => {
           ) : (
             <ListStudents
               students={filteredStudents}
-              getMoreStudents={() => console.log(loadMore())}
+              isLoadingMore={isLoadingMore}
+              getMoreStudents={loadMore}
             />
           )}
         </View>

@@ -1,25 +1,39 @@
-import { FlatList } from "react-native";
+import { FlatList, Text } from "react-native";
 import React from "react";
 import StudentCardItem from "./StudentCardItem";
-import { Student } from "@/types/student";
+import { StudentsSelectedFields } from "@/app/students";
 
 interface ListStudentsProps {
-  students: Student[];
+  students: StudentsSelectedFields[];
   getMoreStudents: () => void;
+  isLoadingMore: boolean;
 }
 
-const ListStudents = ({ students, getMoreStudents }: ListStudentsProps) => {
+const ListStudents = ({
+  students,
+  getMoreStudents,
+  isLoadingMore,
+}: ListStudentsProps) => {
   return (
     <FlatList
       data={students}
       keyExtractor={(item, index) =>
         item.id.value ? item.id.value.toString() : `key-${index}`
       }
-      renderItem={({ item }) => <StudentCardItem student={item} />}
+      renderItem={({ item, index }) => (
+        <>
+          <StudentCardItem student={item} />
+          {index === students.length - 1 && isLoadingMore && (
+            <Text className="mt-5 text-center text-lg font-semibold text-white">
+              Carregando...
+            </Text>
+          )}
+        </>
+      )}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       contentContainerClassName="gap-4 pb-20"
-      onEndReached={() => getMoreStudents()}
+      onEndReached={getMoreStudents}
     />
   );
 };

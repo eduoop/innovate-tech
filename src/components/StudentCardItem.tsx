@@ -1,13 +1,13 @@
 import { View, Text } from "react-native";
 import React, { memo } from "react";
-import { Student } from "@/types/student";
 import { Avatar, AvatarFallback, AvatarImage } from "./Avatar";
 import moment from "moment";
 
 interface StudentCardProps {
-  student: Student;
+  student: StudentsSelectedFields;
 }
 import Foundation from "@expo/vector-icons/Foundation";
+import { StudentsSelectedFields } from "@/app/students";
 
 const StudentCardItem = ({ student }: StudentCardProps) => {
   const formatDate = moment(student.registered.date).format("DD/mm/yyyy");
@@ -33,7 +33,7 @@ const StudentCardItem = ({ student }: StudentCardProps) => {
       <Avatar className="h-20 w-20 rounded-2xl">
         <AvatarImage
           source={{
-            uri: `${student.picture.large}`,
+            uri: `${student.picture.medium}`,
           }}
         />
         <AvatarFallback>CG</AvatarFallback>

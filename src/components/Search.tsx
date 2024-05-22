@@ -1,5 +1,5 @@
 import { View, TextInput, Pressable } from "react-native";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, memo } from "react";
 import { colors } from "@/theme/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { cn } from "@/lib/utils";
@@ -34,4 +34,4 @@ const Search = ({ setValue, value }: SearchProps) => {
   );
 };
 
-export default Search;
+export default memo(Search);
