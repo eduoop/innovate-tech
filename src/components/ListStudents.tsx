@@ -18,7 +18,7 @@ const ListStudents = ({ students, getMoreStudents }: ListStudentsProps) => {
       renderItem={({ item }) => <StudentCardItem student={item} />}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
-      contentContainerClassName="gap-4"
+      contentContainerClassName="gap-4 pb-20"
       onEndReached={() => getMoreStudents()}
     />
   );

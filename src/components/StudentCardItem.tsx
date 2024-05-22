@@ -17,6 +17,17 @@ const StudentCardItem = ({ student }: StudentCardProps) => {
     ) : (
       <Foundation name="female-symbol" size={24} color="#E50064" />
     );
+
+  const traduceGender = (gender: string) => {
+    if (gender === "male") {
+      return "Masculino";
+    } else if (gender === "female") {
+      return "Feminino";
+    } else {
+      return "Indefinido";
+    }
+  };
+
   return (
     <View className="w-full flex-row items-center gap-2 rounded-2xl border border-zinc-600/15 bg-zinc-800/20 p-2">
       <Avatar className="h-20 w-20 rounded-2xl">
@@ -35,7 +46,9 @@ const StudentCardItem = ({ student }: StudentCardProps) => {
         <View className="w-full flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
             {gender}
-            <Text className="text-white/85">{student.gender}</Text>
+            <Text className="text-white/85">
+              {traduceGender(student.gender)}
+            </Text>
           </View>
 
           <Text className="text-white/85">{formatDate}</Text>

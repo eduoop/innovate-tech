@@ -77,7 +77,7 @@ const Students = () => {
         </Text>
       </View>
 
-      <View className="mb-32 w-full flex-1">
+      <View className="w-full flex-1">
         <View className="gap-4 px-5">
           <View className="w-full flex-row items-center gap-3">
             <Search setValue={setSearch} value={search} />
@@ -94,7 +94,7 @@ const Students = () => {
             genderFilters={genderFilters}
           />
         </View>
-        <View className="flex-2 mt-6 w-full px-5 pb-20">
+        <View className="mt-6 w-full flex-1 px-5">
           {isLoading ? (
             <ListStudentsSkeleton count={10} />
           ) : (
