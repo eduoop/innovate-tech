@@ -1,43 +1,51 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { useQuery } from "react-query";
 import { Student } from "@/types/student";
 import Search from "@/components/Search";
-
-const fetchStudents = async (page: number) => {
-  const res = await api.get(`?results=10&page=${page}`);
-  return res.data.results;
-};
+import ListStudents from "@/components/ListStudents";
+import { colors } from "@/theme/colors";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Keyboard } from "react-native";
+import ListStudentsSkeleton from "@/components/ListStudentsSkeleton";
+import GenderFilters from "@/components/GenderFilters";
+export interface GenderFilter {
+  male: boolean;
+  female: boolean;
+}
 
 const Students = () => {
   const [page, setPage] = useState(1);
   const [students, setStudents] = useState<Student[]>([]);
   const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [genderFilters, setGenderFilters] = useState<GenderFilter>({
+    male: true,
+    female: true,
+  });
 
-  const { isLoading, data } = useQuery(
-    ["students", page],
-    () => fetchStudents(page),
-    {
-      keepPreviousData: true,
-    },
-  );
-
-  useEffect(() => {
-    if (data) {
-      setStudents((prev) => [...prev, ...data]);
+  const searchStudents = async () => {
+    setIsLoading(true);
+    try {
+      const data = await api.get(
+        `?results=10${page && `&page=${page}`}${search && `&search=${search}`}`,
+      );
+      setStudents(data.data.results);
+      Keyboard.dismiss();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [data]);
-
-  const loadMore = () => {
-    setPage((prevPage) => prevPage + 1);
   };
 
-  if (isLoading) return <Text>Loading...</Text>;
+  const loadMore = () => {
+    setPage(page + 1);
+  };
 
-  console.log(students, loadMore);
-
-  console.log(search);
+  useEffect(() => {
+    searchStudents();
+  }, []);
 
   return (
     <View className="flex-1 items-center bg-primaryZinc-900 pt-16">
@@ -46,8 +54,34 @@ const Students = () => {
           InnovateTech
         </Text>
       </View>
-      <View className="w-full px-5">
-        <Search setValue={setSearch} />
+
+      <View className="mb-32 w-full flex-1">
+        <View className="gap-4 px-5">
+          <View className="w-full flex-row items-center gap-3">
+            <Search setValue={setSearch} value={search} />
+            <Pressable onPress={searchStudents}>
+              <Ionicons
+                name={"arrow-forward-circle"}
+                size={30}
+                color={colors.white}
+              />
+            </Pressable>
+          </View>
+          <GenderFilters
+            setGenderFilters={setGenderFilters}
+            genderFilters={genderFilters}
+          />
+        </View>
+        <View className="mb-50 mt-6 w-full px-5">
+          {isLoading ? (
+            <ListStudentsSkeleton count={10} />
+          ) : (
+            <ListStudents
+              students={students}
+              getMoreStudents={() => console.log(loadMore())}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
