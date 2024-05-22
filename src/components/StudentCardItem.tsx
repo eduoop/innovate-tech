@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import { Student } from "@/types/student";
 import { Avatar, AvatarFallback, AvatarImage } from "./Avatar";
 import moment from "moment";
@@ -45,4 +45,4 @@ const StudentCardItem = ({ student }: StudentCardProps) => {
   );
 };
 
-export default StudentCardItem;
+export default memo(StudentCardItem);

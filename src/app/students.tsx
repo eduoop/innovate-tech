@@ -17,6 +17,7 @@ export interface GenderFilter {
 const Students = () => {
   const [page, setPage] = useState(1);
   const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [genderFilters, setGenderFilters] = useState<GenderFilter>({
@@ -39,9 +40,30 @@ const Students = () => {
     }
   };
 
+  const filterStudents = () => {
+    if (genderFilters.male && genderFilters.female) {
+      // Se ambos os filtros estiverem selecionados, limpe o array de alunos filtrados
+      setFilteredStudents(students);
+    } else if (!genderFilters.male && !genderFilters.female) {
+      setFilteredStudents(students);
+    } else {
+      const filteredStudents = students.filter((student) => {
+        return (
+          (student.gender === "male" && genderFilters.male) ||
+          (student.gender === "female" && genderFilters.female)
+        );
+      });
+      setFilteredStudents(filteredStudents);
+    }
+  };
+
   const loadMore = () => {
     setPage(page + 1);
   };
+
+  useEffect(() => {
+    filterStudents();
+  }, [genderFilters]);
 
   useEffect(() => {
     searchStudents();
@@ -72,12 +94,12 @@ const Students = () => {
             genderFilters={genderFilters}
           />
         </View>
-        <View className="mb-50 mt-6 w-full px-5">
+        <View className="flex-2 mt-6 w-full px-5 pb-20">
           {isLoading ? (
             <ListStudentsSkeleton count={10} />
           ) : (
             <ListStudents
-              students={students}
+              students={filteredStudents}
               getMoreStudents={() => console.log(loadMore())}
             />
           )}
