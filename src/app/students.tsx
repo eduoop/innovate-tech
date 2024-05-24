@@ -55,7 +55,7 @@ const Students = () => {
   const getStudents = async () => {
     setIsLoading(true);
     try {
-      const data = await api.get(`?results=10&page=${page}`);
+      const data = await api.get(`?results=20&page=${page}`);
       const filteredFieldsStudents = filterUnusedFields(data.data.results);
       setStudents(filteredFieldsStudents);
       setFilteredStudents(filteredFieldsStudents);
@@ -70,10 +70,10 @@ const Students = () => {
     setIsLoading(true);
     try {
       const data = await api.get(
-        `?results=10${page && `&page=${page}`}${search && `&search=${search}`}`,
+        `?results=20${page && `&page=${page}`}${search && `&search=${search}`}`,
       );
       setStudents(data.data.results);
-      setFilteredStudents(data.data.results);
+      filterStudents();
       Keyboard.dismiss();
     } catch (error) {
       console.log(error);
@@ -102,7 +102,7 @@ const Students = () => {
     setIsLoadingMore(true);
     setPage(page + 1);
     api
-      .get(`?results=10&page=${page}${search && `&search=${search}`}`)
+      .get(`?results=20&page=${page}${search && `&search=${search}`}`)
       .then((response) => {
         const filteredFieldsStudents = filterUnusedFields(
           response.data.results,
