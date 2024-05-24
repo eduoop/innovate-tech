@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import React, { memo } from "react";
+import { View, Text, Pressable } from "react-native";
+import React, { memo, useContext } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./Avatar";
 import moment from "moment";
 
@@ -8,8 +8,10 @@ interface StudentCardProps {
 }
 import Foundation from "@expo/vector-icons/Foundation";
 import { StudentsSelectedFields } from "@/app/students";
+import { StudentsContext } from "@/contexts/StudentsContext";
 
 const StudentCardItem = ({ student }: StudentCardProps) => {
+  const { handleBottomMenuPress, setStudent } = useContext(StudentsContext);
   const formatDate = moment(student.registered.date).format("DD/mm/yyyy");
   const gender =
     student.gender === "male" ? (
@@ -28,8 +30,16 @@ const StudentCardItem = ({ student }: StudentCardProps) => {
     }
   };
 
+  const handleClickSheetOpen = () => {
+    setStudent(student);
+    handleBottomMenuPress();
+  };
+
   return (
-    <View className="w-full flex-row items-center gap-2 rounded-2xl border border-zinc-600/15 bg-zinc-800/20 p-2">
+    <Pressable
+      onPress={() => handleClickSheetOpen()}
+      className="w-full flex-row items-center gap-2 rounded-2xl border border-zinc-600/15 bg-zinc-800/20 p-2"
+    >
       <Avatar className="h-20 w-20 rounded-2xl">
         <AvatarImage
           source={{
@@ -54,7 +64,7 @@ const StudentCardItem = ({ student }: StudentCardProps) => {
           <Text className="text-white/85">{formatDate}</Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

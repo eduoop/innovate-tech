@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Student } from "@/types/student";
 import Search from "@/components/Search";
@@ -9,6 +9,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Keyboard } from "react-native";
 import ListStudentsSkeleton from "@/components/ListStudentsSkeleton";
 import GenderFilters from "@/components/GenderFilters";
+import { BottomSheetMenu } from "@/components/BottomSheetMenu";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { StudentsContext } from "@/contexts/StudentsContext";
 export interface GenderFilter {
   male: boolean;
   female: boolean;
@@ -36,7 +39,11 @@ const Students = () => {
   });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const filterUnusedFields = (students: Student[]) => {
+  const { bottomSheetUseRef, student } = useContext(StudentsContext);
+
+  const filterUnusedFields = (
+    students: Student[],
+  ): StudentsSelectedFields[] => {
     return students.map((student) => {
       return {
         id: student.id,
@@ -73,7 +80,7 @@ const Students = () => {
         `?results=20${page && `&page=${page}`}${search && `&search=${search}`}`,
       );
       setStudents(data.data.results);
-      filterStudents();
+      filterStudents(data.data.results);
       Keyboard.dismiss();
     } catch (error) {
       console.log(error);
@@ -82,19 +89,29 @@ const Students = () => {
     }
   };
 
-  const filterStudents = () => {
+  const filterStudents = (studentsParam?: StudentsSelectedFields[]) => {
     if (genderFilters.male && genderFilters.female) {
-      setFilteredStudents(students);
+      setFilteredStudents(studentsParam ? studentsParam : students);
     } else if (!genderFilters.male && !genderFilters.female) {
-      setFilteredStudents(students);
+      setFilteredStudents(studentsParam ? studentsParam : students);
     } else {
-      const filteredStudents = students.filter((student) => {
-        return (
-          (student.gender === "male" && genderFilters.male) ||
-          (student.gender === "female" && genderFilters.female)
-        );
-      });
-      setFilteredStudents(filteredStudents);
+      if (studentsParam) {
+        const filteredStudents = studentsParam.filter((student) => {
+          return (
+            (student.gender === "male" && genderFilters.male) ||
+            (student.gender === "female" && genderFilters.female)
+          );
+        });
+        setFilteredStudents(filteredStudents);
+      } else {
+        const filteredStudents = students.filter((student) => {
+          return (
+            (student.gender === "male" && genderFilters.male) ||
+            (student.gender === "female" && genderFilters.female)
+          );
+        });
+        setFilteredStudents(filteredStudents);
+      }
     }
   };
 
@@ -134,13 +151,22 @@ const Students = () => {
         <View className="gap-4 px-5">
           <View className="w-full flex-row items-center gap-3">
             <Search setValue={setSearch} value={search} />
-            <Pressable onPress={searchStudents}>
-              <Ionicons
-                name={"arrow-forward-circle"}
-                size={30}
+            {!isLoading ? (
+              <Pressable onPress={searchStudents}>
+                <Ionicons
+                  name={"arrow-forward-circle"}
+                  size={32}
+                  color={colors.white}
+                />
+              </Pressable>
+            ) : (
+              <AntDesign
+                name={"loading2"}
+                className="animate-spin"
+                size={32}
                 color={colors.white}
               />
-            </Pressable>
+            )}
           </View>
           <GenderFilters
             setGenderFilters={setGenderFilters}
@@ -159,6 +185,7 @@ const Students = () => {
           )}
         </View>
       </View>
+      {student && <BottomSheetMenu ref={bottomSheetUseRef} />}
     </View>
   );
 };

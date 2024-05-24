@@ -1,4 +1,4 @@
-import { View, StatusBar } from "react-native";
+import { StatusBar } from "react-native";
 import React from "react";
 import {
   useFonts as useRoboto,
@@ -20,11 +20,10 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { Slot } from "expo-router";
 import "@/styles/global.css";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StudentsProvider } from "@/contexts/StudentsContext";
 
 SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient();
 
 const Layout = () => {
   const [RobotoFontsLoaded] = useRoboto({
@@ -49,12 +48,12 @@ const Layout = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <View style={{ flex: 1 }}>
+    <StudentsProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar barStyle="light-content" />
         {RobotoFontsLoaded && RalewayFontsLoaded && <Slot />}
-      </View>
-    </QueryClientProvider>
+      </GestureHandlerRootView>
+    </StudentsProvider>
   );
 };
 
