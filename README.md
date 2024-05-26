@@ -46,6 +46,7 @@ para rodar o projeto, use: <npx expo --clear>
 ## Tecnologias Utilizadas
 
 - **React** (v18)
+- **React Native** (v0.74)
 - **Tailwind CSS** (v3.4.3)
 - **TypeScript** (v5)
 

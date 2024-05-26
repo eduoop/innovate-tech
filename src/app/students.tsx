@@ -13,6 +13,7 @@ import { BottomSheetMenu } from "@/components/BottomSheetMenu";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { StudentsContext } from "@/contexts/StudentsContext";
 import useStorage from "@/hooks/useStorage";
+import { getStudentsApi } from "@/utils/getStudentsApi";
 export interface GenderFilter {
   male: boolean;
   female: boolean;
@@ -69,20 +70,28 @@ const Students = () => {
     }
   };
 
-  const searchStudents = async () => {
-    setIsLoading(true);
-    try {
-      const data = await api.get(
-        `?results=20${page && `&page=${page}`}${search && `&search=${search}`}`,
+  const searchStudents = () => {
+    const nameFilterLower = search.toLowerCase().trim();
+
+    const filterByName = (student: StudentsSelectedFields) => {
+      return (
+        student.name.first.toLowerCase().includes(nameFilterLower) ||
+        student.name.last.toLowerCase().includes(nameFilterLower)
       );
-      setStudents(data.data.results);
-      filterStudents(data.data.results);
-      Keyboard.dismiss();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    const genderFilteredStudents = students.filter((student) => {
+      return (
+        (genderFilters.male && student.gender === "male") ||
+        (genderFilters.female && student.gender === "female")
+      );
+    });
+
+    const nameAndGenderFilteredStudents =
+      genderFilteredStudents.filter(filterByName);
+
+    setFilteredStudents(nameAndGenderFilteredStudents);
+    Keyboard.dismiss();
   };
 
   const filterStudents = (studentsParam?: StudentsSelectedFields[]) => {
@@ -123,6 +132,19 @@ const Students = () => {
       });
   };
 
+  const getRandomStudentsApi = async () => {
+    setIsLoading(true);
+    const data = await getStudentsApi();
+    data && setStudents(data);
+    data && setFilteredStudents(data);
+    setIsLoading(false);
+    Keyboard.dismiss();
+  };
+
+  const resetStudents = () => {
+    setFilteredStudents(students);
+  };
+
   useEffect(() => {
     filterStudents();
   }, [genderFilters]);
@@ -131,20 +153,31 @@ const Students = () => {
     getStudents();
   }, []);
 
+  console.log(filteredStudents);
+
   return (
     <View className="flex-1 items-center bg-primaryZinc-900 pt-16">
-      <View className="mb-5 w-full items-center border-b-[1px] border-b-zinc-600/15 px-3 pb-4">
+      <Pressable
+        onPress={getRandomStudentsApi}
+        className="mb-5 w-full items-center border-b-[1px] border-b-zinc-600/15 px-3 pb-4"
+      >
         <Text className="font-medium text-3xl text-primaryRed-900 ">
           InnovateTech
         </Text>
-      </View>
+      </Pressable>
 
       <View className="w-full flex-1">
         <View className="gap-4 px-5">
           <View className="w-full flex-row items-center gap-3">
-            <Search setValue={setSearch} value={search} />
+            <Search
+              setValue={setSearch}
+              value={search}
+              resetStudents={resetStudents}
+            />
             {!isLoading ? (
-              <Pressable onPress={searchStudents}>
+              <Pressable
+                onPress={search ? searchStudents : getRandomStudentsApi}
+              >
                 <Ionicons
                   name={"arrow-forward-circle"}
                   size={32}
@@ -172,7 +205,11 @@ const Students = () => {
             <ListStudents
               students={filteredStudents}
               isLoadingMore={isLoadingMore}
-              getMoreStudents={loadMore}
+              getMoreStudents={
+                !search || (!search && filteredStudents.length >= 20)
+                  ? loadMore
+                  : () => {}
+              }
             />
           )}
         </View>

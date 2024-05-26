@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 interface SearchProps {
   setValue: Dispatch<SetStateAction<string>>;
   value: string;
+  resetStudents: () => void;
 }
 
-const Search = ({ setValue, value }: SearchProps) => {
+const Search = ({ setValue, value, resetStudents }: SearchProps) => {
   return (
     <View className="flex-1 flex-row items-center gap-2 rounded-2xl border border-zinc-600/15 bg-zinc-800/20 px-4 py-1">
       <TextInput
@@ -23,6 +24,7 @@ const Search = ({ setValue, value }: SearchProps) => {
       <Pressable
         onPress={() => {
           setValue("");
+          resetStudents();
         }}
         className={cn("hidden opacity-40", {
           block: value.length > 0,
