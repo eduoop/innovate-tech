@@ -58,7 +58,6 @@ const Students = () => {
     }
 
     try {
-      console.log("try");
       const data = await api.get(`?results=20&page=${page}`);
       setStudents(data.data.results);
       setFilteredStudents(data.data.results);
