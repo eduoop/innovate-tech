@@ -43,10 +43,6 @@ Linux, macOS e Windows:
 para rodar o projeto, use: <npx expo --clear>
 ```
 
-## ⛓️ Veja o vídeo de preview
-
-[Clique Aqui](assets/videos/presentation-video.mp4 "Download do Vídeo de Apresentação")
-
 ## Tecnologias Utilizadas
 
 - **React** (v18)
