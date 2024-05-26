@@ -1,19 +1,19 @@
-import { View, Text, Pressable } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
+import { View, Text, Pressable, Keyboard } from "react-native";
 import { api } from "@/lib/api";
 import { Student } from "@/types/student";
 import Search from "@/components/Search";
 import ListStudents from "@/components/ListStudents";
 import { colors } from "@/theme/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Keyboard } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import ListStudentsSkeleton from "@/components/ListStudentsSkeleton";
 import GenderFilters from "@/components/GenderFilters";
 import { BottomSheetMenu } from "@/components/BottomSheetMenu";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { StudentsContext } from "@/contexts/StudentsContext";
 import useStorage from "@/hooks/useStorage";
 import { getStudentsApi } from "@/utils/getStudentsApi";
+
 export interface GenderFilter {
   male: boolean;
   female: boolean;
@@ -42,13 +42,11 @@ const Students = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const { setStorageArray, getStorageValue } = useStorage();
-
   const { bottomSheetUseRef, student, handleBottomMenuClose } =
     useContext(StudentsContext);
 
   const getStudents = async () => {
     setIsLoading(true);
-
     const cachedStudents = await getStorageValue("students");
 
     if (cachedStudents) {
@@ -72,20 +70,15 @@ const Students = () => {
 
   const searchStudents = () => {
     const nameFilterLower = search.toLowerCase().trim();
+    const filterByName = (student: StudentsSelectedFields) =>
+      student.name.first.toLowerCase().includes(nameFilterLower) ||
+      student.name.last.toLowerCase().includes(nameFilterLower);
 
-    const filterByName = (student: StudentsSelectedFields) => {
-      return (
-        student.name.first.toLowerCase().includes(nameFilterLower) ||
-        student.name.last.toLowerCase().includes(nameFilterLower)
-      );
-    };
-
-    const genderFilteredStudents = students.filter((student) => {
-      return (
+    const genderFilteredStudents = students.filter(
+      (student) =>
         (genderFilters.male && student.gender === "male") ||
-        (genderFilters.female && student.gender === "female")
-      );
-    });
+        (genderFilters.female && student.gender === "female"),
+    );
 
     const nameAndGenderFilteredStudents =
       genderFilteredStudents.filter(filterByName);
@@ -95,29 +88,12 @@ const Students = () => {
   };
 
   const filterStudents = (studentsParam?: StudentsSelectedFields[]) => {
-    if (genderFilters.male && genderFilters.female) {
-      setFilteredStudents(studentsParam ? studentsParam : students);
-    } else if (!genderFilters.male && !genderFilters.female) {
-      setFilteredStudents(studentsParam ? studentsParam : students);
-    } else {
-      if (studentsParam) {
-        const filteredStudents = studentsParam.filter((student) => {
-          return (
-            (student.gender === "male" && genderFilters.male) ||
-            (student.gender === "female" && genderFilters.female)
-          );
-        });
-        setFilteredStudents(filteredStudents);
-      } else {
-        const filteredStudents = students.filter((student) => {
-          return (
-            (student.gender === "male" && genderFilters.male) ||
-            (student.gender === "female" && genderFilters.female)
-          );
-        });
-        setFilteredStudents(filteredStudents);
-      }
-    }
+    const filteredStudents = (studentsParam || students).filter(
+      (student) =>
+        (genderFilters.male && student.gender === "male") ||
+        (genderFilters.female && student.gender === "female"),
+    );
+    setFilteredStudents(filteredStudents);
   };
 
   const loadMore = () => {
@@ -153,15 +129,13 @@ const Students = () => {
     getStudents();
   }, []);
 
-  console.log(filteredStudents);
-
   return (
     <View className="flex-1 items-center bg-primaryZinc-900 pt-16">
       <Pressable
         onPress={getRandomStudentsApi}
         className="mb-5 w-full items-center border-b-[1px] border-b-zinc-600/15 px-3 pb-4"
       >
-        <Text className="font-medium text-3xl text-primaryRed-900 ">
+        <Text className="font-medium text-3xl text-primaryRed-900">
           InnovateTech
         </Text>
       </Pressable>
