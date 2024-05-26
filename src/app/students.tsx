@@ -42,31 +42,12 @@ const Students = () => {
   const { bottomSheetUseRef, student, handleBottomMenuClose } =
     useContext(StudentsContext);
 
-  const filterUnusedFields = (
-    students: Student[],
-  ): StudentsSelectedFields[] => {
-    return students.map((student) => {
-      return {
-        id: student.id,
-        name: student.name,
-        gender: student.gender,
-        registered: student.registered,
-        picture: student.picture,
-        email: student.email,
-        phone: student.phone,
-        address: student.location,
-        nature: student.nat,
-      };
-    });
-  };
-
   const getStudents = async () => {
     setIsLoading(true);
     try {
       const data = await api.get(`?results=20&page=${page}`);
-      const filteredFieldsStudents = filterUnusedFields(data.data.results);
-      setStudents(filteredFieldsStudents);
-      setFilteredStudents(filteredFieldsStudents);
+      setStudents(data.data.results);
+      setFilteredStudents(data.data.results);
     } catch (error) {
       console.log(error);
     } finally {
@@ -122,11 +103,7 @@ const Students = () => {
     api
       .get(`?results=20&page=${page}${search && `&search=${search}`}`)
       .then((response) => {
-        const filteredFieldsStudents = filterUnusedFields(
-          response.data.results,
-        );
-
-        setStudents([...students, ...filteredFieldsStudents]);
+        setStudents([...students, ...response.data.results]);
         filterStudents();
         setIsLoadingMore(false);
       });
