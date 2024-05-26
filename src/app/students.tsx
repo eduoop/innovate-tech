@@ -40,6 +40,7 @@ const Students = () => {
     female: true,
   });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [canLoadingMore, setCanLoadingMore] = useState(true);
 
   const { setStorageArray, getStorageValue } = useStorage();
   const { bottomSheetUseRef, student, handleBottomMenuClose } =
@@ -69,6 +70,7 @@ const Students = () => {
   };
 
   const searchStudents = () => {
+    setCanLoadingMore(false);
     const nameFilterLower = search.toLowerCase().trim();
     const filterByName = (student: StudentsSelectedFields) =>
       student.name.first.toLowerCase().includes(nameFilterLower) ||
@@ -88,6 +90,7 @@ const Students = () => {
   };
 
   const filterStudents = (studentsParam?: StudentsSelectedFields[]) => {
+    setCanLoadingMore(true);
     const filteredStudents = (studentsParam || students).filter(
       (student) =>
         (genderFilters.male && student.gender === "male") ||
@@ -109,16 +112,18 @@ const Students = () => {
   };
 
   const getRandomStudentsApi = async () => {
+    setCanLoadingMore(true);
     setIsLoading(true);
     const data = await getStudentsApi();
     data && setStudents(data);
-    data && setFilteredStudents(data);
+    data && filterStudents(data);
     setIsLoading(false);
     Keyboard.dismiss();
   };
 
   const resetStudents = () => {
-    setFilteredStudents(students);
+    setCanLoadingMore(true);
+    filterStudents(students);
   };
 
   useEffect(() => {
@@ -179,11 +184,7 @@ const Students = () => {
             <ListStudents
               students={filteredStudents}
               isLoadingMore={isLoadingMore}
-              getMoreStudents={
-                !search || (!search && filteredStudents.length >= 20)
-                  ? loadMore
-                  : () => {}
-              }
+              getMoreStudents={canLoadingMore ? loadMore : () => {}}
             />
           )}
         </View>
