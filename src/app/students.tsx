@@ -12,6 +12,7 @@ import GenderFilters from "@/components/GenderFilters";
 import { BottomSheetMenu } from "@/components/BottomSheetMenu";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { StudentsContext } from "@/contexts/StudentsContext";
+import useStorage from "@/hooks/useStorage";
 export interface GenderFilter {
   male: boolean;
   female: boolean;
@@ -39,15 +40,29 @@ const Students = () => {
   });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  const { setStorageArray, getStorageValue } = useStorage();
+
   const { bottomSheetUseRef, student, handleBottomMenuClose } =
     useContext(StudentsContext);
 
   const getStudents = async () => {
     setIsLoading(true);
+
+    const cachedStudents = await getStorageValue("students");
+
+    if (cachedStudents) {
+      setStudents(cachedStudents);
+      setFilteredStudents(cachedStudents);
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      console.log("try");
       const data = await api.get(`?results=20&page=${page}`);
       setStudents(data.data.results);
       setFilteredStudents(data.data.results);
+      setStorageArray("students", data.data.results);
     } catch (error) {
       console.log(error);
     } finally {
