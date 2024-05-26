@@ -39,7 +39,8 @@ const Students = () => {
   });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const { bottomSheetUseRef, student } = useContext(StudentsContext);
+  const { bottomSheetUseRef, student, handleBottomMenuClose } =
+    useContext(StudentsContext);
 
   const filterUnusedFields = (
     students: Student[],
@@ -185,7 +186,12 @@ const Students = () => {
           )}
         </View>
       </View>
-      {student && <BottomSheetMenu ref={bottomSheetUseRef} />}
+      {student && (
+        <BottomSheetMenu
+          onClose={handleBottomMenuClose}
+          ref={bottomSheetUseRef}
+        />
+      )}
     </View>
   );
 };
