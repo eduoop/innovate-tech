@@ -94,7 +94,7 @@ const BottomSheetMenu = forwardRef<BottomSheet, BottomMenuProps>(
               <View className="w-[50%] gap-1">
                 <Text className="text-white/50">Nacionalidade</Text>
                 <Text className="text-[14px] font-semibold text-white">
-                  {moment(student.registered.date).format("DD/MM/YYYY")}
+                  {student.nat}
                 </Text>
               </View>
               <View className="w-[50%] gap-1">
